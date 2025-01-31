@@ -10,6 +10,8 @@
 		4736ED212D4D2B8000DE6475 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 4736ED202D4D2B8000DE6475 /* RxCocoa */; };
 		4736ED232D4D2B8000DE6475 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 4736ED222D4D2B8000DE6475 /* RxRelay */; };
 		4736ED252D4D2B8000DE6475 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4736ED242D4D2B8000DE6475 /* RxSwift */; };
+		4736ED412D4D33A500DE6475 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4736ED402D4D33A500DE6475 /* SnapKit */; };
+		4736ED442D4D33CC00DE6475 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 4736ED432D4D33CC00DE6475 /* Then */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,7 +73,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4736ED442D4D33CC00DE6475 /* Then in Frameworks */,
 				4736ED252D4D2B8000DE6475 /* RxSwift in Frameworks */,
+				4736ED412D4D33A500DE6475 /* SnapKit in Frameworks */,
 				4736ED232D4D2B8000DE6475 /* RxRelay in Frameworks */,
 				4736ED212D4D2B8000DE6475 /* RxCocoa in Frameworks */,
 			);
@@ -137,6 +141,8 @@
 				4736ED202D4D2B8000DE6475 /* RxCocoa */,
 				4736ED222D4D2B8000DE6475 /* RxRelay */,
 				4736ED242D4D2B8000DE6475 /* RxSwift */,
+				4736ED402D4D33A500DE6475 /* SnapKit */,
+				4736ED432D4D33CC00DE6475 /* Then */,
 			);
 			productName = Flo_Clone;
 			productReference = 47213BE12D4D292F00472320 /* Flo_Clone.app */;
@@ -222,6 +228,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				4736ED1F2D4D2B8000DE6475 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				4736ED3F2D4D33A500DE6475 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				4736ED422D4D33CC00DE6475 /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 47213BE22D4D292F00472320 /* Products */;
@@ -309,9 +317,9 @@
 				INFOPLIST_FILE = Flo_Clone/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -337,9 +345,9 @@
 				INFOPLIST_FILE = Flo_Clone/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -594,6 +602,22 @@
 				minimumVersion = 6.8.0;
 			};
 		};
+		4736ED3F2D4D33A500DE6475 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		4736ED422D4D33CC00DE6475 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -611,6 +635,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4736ED1F2D4D2B8000DE6475 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
+		};
+		4736ED402D4D33A500DE6475 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4736ED3F2D4D33A500DE6475 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		4736ED432D4D33CC00DE6475 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4736ED422D4D33CC00DE6475 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
