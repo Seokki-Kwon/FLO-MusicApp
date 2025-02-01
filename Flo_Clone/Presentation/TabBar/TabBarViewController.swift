@@ -73,7 +73,7 @@ class TabBarViewController: UIViewController {
         for (index, vc) in viewControllers.enumerated() {
             let button = UIButton()
             var titleContainer = AttributeContainer()
-            titleContainer.font = UIFont.systemFont(ofSize: 11)
+            titleContainer.font = UIFont.systemFont(ofSize: 12)
                    
             button.configurationUpdateHandler = { button in
                 var configuration = UIButton.Configuration.plain()
@@ -84,6 +84,7 @@ class TabBarViewController: UIViewController {
                 configuration.imagePadding = 10
                 switch button.state {
                 case .selected:
+                    configuration.image = self.buttonImage[index]?.withTintColor(UIColor.white)
                     configuration.baseForegroundColor = .white
                 default:
                     configuration.baseForegroundColor = .gray
