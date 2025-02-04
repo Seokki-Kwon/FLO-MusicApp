@@ -12,7 +12,6 @@ import RxSwift
 
 class CategoryCell: UICollectionViewCell {
     var categoryInfo: Category!
-    var disposeBag = DisposeBag()
     let categoryLabel = UILabel().then {
         $0.text = ""
         $0.textColor = .gray
@@ -30,17 +29,19 @@ class CategoryCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        categoryLabel.layer.sublayers?.removeAll()
-        if categoryInfo.isSelected {
-            categoryLabel.layer.addBorder([.bottom], color: .main, width: 2)
+    override var isSelected: Bool {
+        didSet {
+            categoryLabel.textColor = isSelected ? .white : .gray
+            if isSelected {
+                categoryLabel.layer.addBorder([.bottom], color: .main, width: 2)
+            } else {
+                categoryLabel.layer.sublayers?.removeAll()
+            }
         }
     }
     
     func setupUI() {
         addSubview(categoryLabel)
-        
         categoryLabel.snp.makeConstraints {
             $0.center.bottom.top.equalToSuperview()
         }
@@ -48,10 +49,8 @@ class CategoryCell: UICollectionViewCell {
     
     func configure(_ category: Category) {
         // 초기 UI설정
-        categoryLabel.text = category.categoryName
-        categoryLabel.textColor = category.isSelected ? .white : .gray
-        self.categoryInfo = category
-    }        
+        categoryLabel.text = category.categoryName        
+    }
     
     override func prepareForReuse() {
         super.prepareForReuse()

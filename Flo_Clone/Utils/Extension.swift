@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 extension CALayer {
     func addBorder(_ edges: [UIRectEdge], color: UIColor, width: CGFloat) {
@@ -28,3 +30,15 @@ extension CALayer {
         }
     }
 }
+
+extension ObservableType {
+    func withPrevious(startWith first: Element) -> Observable<(Element, Element)> {
+          return scan((first, first)) { ($0.1, $1) }.skip(1)
+      }
+}
+
+//extension Reactive where Base: UIPageViewController {
+//    var delegate : DelegateProxy<UIPageViewController, UIPageViewControllerDelegate> {
+//        return RxUIPageViewControllerDelegateProxy.proxy(for: self.base)
+//       }
+//}

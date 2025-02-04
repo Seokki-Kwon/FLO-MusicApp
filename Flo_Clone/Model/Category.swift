@@ -6,6 +6,6 @@
 //
 
 struct Category {
-    let categoryName: String
-    var isSelected: Bool
+    let categoryId: Int
+    let categoryName: String    
 }
