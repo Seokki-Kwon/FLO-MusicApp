@@ -30,6 +30,7 @@ class ChartListViewController: UIViewController {
     private let listDivider = UIView().then {
         $0.backgroundColor = .darkGray
     }
+    
     private let pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal).then {
         $0.view.backgroundColor = .black
     }
