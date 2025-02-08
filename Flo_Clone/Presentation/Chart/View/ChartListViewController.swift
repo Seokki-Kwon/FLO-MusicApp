@@ -36,7 +36,7 @@ class ChartListViewController: UIViewController {
     }
     
     private lazy var subViews: [UIViewController] = {
-        let viewControllers = charListVM.categoryItems.value.map { ChartViewController(text: $0.categoryName) }
+        let viewControllers = charListVM.categoryItems.value.map { _ in ChartViewController() }
         return viewControllers
     }()
     
@@ -64,6 +64,7 @@ class ChartListViewController: UIViewController {
             .bind(to: self.collectionView.rx.items) { tableView, row, item in
                 let cell = self.collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.identifier, for: IndexPath(row: row, section: 0)) as! CategoryCell
                 cell.configure(item)
+                
                 return cell
             }
             .disposed(by: disposeBag)

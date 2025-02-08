@@ -8,17 +8,20 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 class ChartViewController: UIViewController {
     
     // MARK: - Properties
     
-    let text: String
+    let bag = DisposeBag()
+    let chartVM = ChartViewModel()
     
     private let selecteAllButton = UIButton().then {
         var buttonConfig = UIButton.Configuration.plain()
         var titleContainer = AttributeContainer()
-        titleContainer.font = UIFont.systemFont(ofSize: 12)
+        titleContainer.font = UIFont.systemFont(ofSize: 14)
         
         buttonConfig.attributedTitle = AttributedString("전체선택", attributes: titleContainer)
         buttonConfig.baseForegroundColor = .white
@@ -30,14 +33,14 @@ class ChartViewController: UIViewController {
     
     private let desciptionLabel = UILabel().then {
         $0.text = "24시간 집계(10시 기준)"
-        $0.font = UIFont.systemFont(ofSize: 11)
+        $0.font = UIFont.systemFont(ofSize: 12)
         $0.textColor = .gray
     }
     
     private let playAllButton = UIButton().then {
         var buttonConfig = UIButton.Configuration.plain()
         var titleContainer = AttributeContainer()
-        titleContainer.font = UIFont.systemFont(ofSize: 13)
+        titleContainer.font = UIFont.systemFont(ofSize: 14)
         
         buttonConfig.attributedTitle = AttributedString("전체듣기", attributes: titleContainer)
         buttonConfig.baseForegroundColor = .white
@@ -54,22 +57,23 @@ class ChartViewController: UIViewController {
         $0.addArrangedSubview(desciptionLabel)
         $0.addArrangedSubview(playAllButton)
     }
-    private let chartList = UITableView().then {
-        $0.backgroundColor = .red
+    private let chartTableView = UITableView().then {
+        $0.separatorStyle = .none        
     }
     
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        chartTableView.register(MusicCell.self, forCellReuseIdentifier: MusicCell.identifier)
         addSubViews()
         setupConstraints()
+        bind()
     }
     
     // MARK: - Initializer
     
-    init(text: String) {
-        self.text = text
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,32 +83,30 @@ class ChartViewController: UIViewController {
     
     // MARK: - Helpers
     
+    func bind() {
+        chartVM.chartList
+            .bind(to: chartTableView.rx.items) { (tableView, row, item) in
+                let cell = tableView.dequeueReusableCell(withIdentifier: MusicCell.identifier) as! MusicCell
+                cell.configure(item)
+                return cell
+            }
+            .disposed(by: bag)
+    }
+    
     func addSubViews() {
         view.addSubview(filterStack)
-        view.addSubview(chartList)
+        view.addSubview(chartTableView)
     }
     
     func setupConstraints() {
         filterStack.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
-            $0.height.equalTo(40)
+            $0.top.leading.trailing.equalToSuperview()
+            $0.height.equalTo(50)
         }
-        chartList.snp.makeConstraints {
+        chartTableView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.top.equalTo(filterStack.snp.bottom)
+            $0.top.equalTo(filterStack.snp.bottom).offset(0)
         }
     }
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
+
 }
