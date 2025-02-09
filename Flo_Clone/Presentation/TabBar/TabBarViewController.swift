@@ -8,12 +8,17 @@
 import UIKit
 import Then
 import SnapKit
+import RxSwift
+import RxCocoa
+import RxGesture
 
 class TabBarViewController: UIViewController {
     
+    // MARK: - Properties
+    
     private var viewControllers: [UIViewController] = []
     private var buttons: [UIButton] = []
-    
+    private let disposeBag = DisposeBag()
     private let buttonImage: [UIImage?] = [
         UIImage(named: "chartIcon"),
         UIImage(named: "coverImage"),
@@ -25,10 +30,12 @@ class TabBarViewController: UIViewController {
         $0.backgroundColor = .black
     }
     
+    private let musicPlayer = MusicPlayer()
+    
     private lazy var tabButtonStack = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
-    }
+    }       
     
     var selectedIndex = 0 {
         willSet {
@@ -40,9 +47,27 @@ class TabBarViewController: UIViewController {
     }
     private var previewsIndex = 0
     
+    // MARK: - LifeCycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
+        bind()
+    }
+    
+    // MARK: - Methods
+    
+    func bind() {
+        musicPlayer.rx.tapGesture()
+            .when(.recognized)
+            .subscribe(onNext: {_ in                
+                let musicPlayNavController = UINavigationController()
+                let musicPlayVC = MusicPlayViewController()
+                musicPlayNavController.setViewControllers([musicPlayVC], animated: true)
+                musicPlayNavController.modalPresentationStyle = .fullScreen
+                self.present(musicPlayNavController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     func setViewControllers(_ viewControllers: [UIViewController]) {
@@ -53,10 +78,16 @@ class TabBarViewController: UIViewController {
     
     private func setupTabBar() {
         view.addSubview(tabBarView)
+        view.addSubview(musicPlayer)
         
         tabBarView.snp.makeConstraints {
             $0.bottom.trailing.leading.equalToSuperview()
             $0.height.equalTo(80)
+        }
+        
+        musicPlayer.snp.makeConstraints { make in
+            make.bottom.equalTo(tabBarView.snp.top)
+            make.leading.trailing.equalToSuperview()
         }
     }
     

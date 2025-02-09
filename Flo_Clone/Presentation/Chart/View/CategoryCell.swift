@@ -34,7 +34,7 @@ class CategoryCell: UICollectionViewCell {
             categoryLabel.textColor = isSelected ? .white : .gray
             if isSelected {
                 categoryLabel.layer.addBorder([.bottom], color: .main, width: 2)
-            } else {
+            } else {            
                 categoryLabel.layer.sublayers?.removeAll()
             }
         }

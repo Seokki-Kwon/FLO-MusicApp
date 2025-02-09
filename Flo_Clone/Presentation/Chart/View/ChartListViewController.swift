@@ -53,8 +53,12 @@ class ChartListViewController: UIViewController {
         setConstraints()
         bind()
         
-    }
+    }    
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        collectionView.selectItem(at: IndexPath(item: 0, section: 0), animated: true, scrollPosition: .centeredHorizontally)
+    }
     // MARK: - Helpers
     
     func bind() {
@@ -87,7 +91,7 @@ class ChartListViewController: UIViewController {
                 vc.pageViewController.setViewControllers([vc.subViews[curIndex]], direction: direction, animated: true)
                 vc.collectionView.selectItem(at: IndexPath(item: curIndex, section: 0), animated: true, scrollPosition: .centeredHorizontally)
             })
-            .disposed(by: disposeBag)
+            .disposed(by: disposeBag)                
     }
     
     func setupDelegates() {

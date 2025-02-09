@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let tabBarVC = TabBarViewController()
         
-        let chartListVC = ChartListViewController()
+        let chartListVC = ChartListViewController()        
         let chartListNavController = UINavigationController()
         let coverNavController = UINavigationController()
         let searchNavController = UINavigationController()
