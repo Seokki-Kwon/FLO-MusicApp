@@ -59,7 +59,7 @@ class ChartViewController: UIViewController {
     }
     private let chartTableView = UITableView().then {
         $0.separatorStyle = .none        
-    }
+    }       
     
     // MARK: - LifeCycle
     
@@ -84,6 +84,7 @@ class ChartViewController: UIViewController {
     // MARK: - Helpers
     
     func bind() {
+                
         chartVM.chartList
             .bind(to: chartTableView.rx.items) { (tableView, row, item) in
                 let cell = tableView.dequeueReusableCell(withIdentifier: MusicCell.identifier) as! MusicCell
@@ -107,6 +108,7 @@ class ChartViewController: UIViewController {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.top.equalTo(filterStack.snp.bottom).offset(0)
         }
+     
     }
 
 }

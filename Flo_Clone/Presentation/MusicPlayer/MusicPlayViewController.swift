@@ -32,13 +32,13 @@ class MusicPlayViewController: UIViewController {
     
     private let likeButton = UIButton().then {
         var image = UIImage(systemName: "heart")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
-        image = image?.applyingSymbolConfiguration(.init(pointSize: 20))
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 25))
         $0.setImage(image, for: .normal)
     }
     
     private let detailButton = UIButton().then {
         var image = UIImage(systemName: "ellipsis")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
-        image = image?.applyingSymbolConfiguration(.init(pointSize: 20))
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 25))
         $0.setImage(image, for: .normal)
         $0.transform = $0.transform.rotated(by: CGFloat(M_PI_2))        
     }
@@ -78,6 +78,94 @@ class MusicPlayViewController: UIViewController {
         $0.text = "가사가사가사가사가사가"
         $0.textColor = .gray
     }
+    private let instaButton = UIButton().then {
+        var instaImage = UIImage(named: "instaImage")
+        $0.setImage(instaImage, for: .normal)
+    }
+    private let similarSongButton = UIButton().then {
+        $0.clipsToBounds = true
+        $0.layer.borderColor = UIColor.darkGray.cgColor
+        $0.layer.borderWidth = 0.5
+        $0.layer.cornerRadius = 14
+        var configuration = UIButton.Configuration.plain()
+        var titleContainer = AttributeContainer()
+        titleContainer.font = UIFont.systemFont(ofSize: 12)
+        
+        configuration.attributedTitle = AttributedString("유사곡", attributes: titleContainer)
+        configuration.baseForegroundColor = .white
+        
+        $0.configuration = configuration
+    }
+    private let playListButton = UIButton().then {
+        var image = UIImage(systemName: "music.note.list")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 25))
+        $0.setImage(image, for: .normal)
+    }
+    private lazy var bottomStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.distribution = .equalSpacing
+        $0.addArrangedSubview(instaButton)
+        $0.addArrangedSubview(similarSongButton)
+        $0.addArrangedSubview(playListButton)
+    }
+    private let seekBar = UIView().then {
+        $0.backgroundColor = .darkGray
+    }
+    private let startTimeLabel = UILabel().then {
+        $0.text = "00:00"
+        $0.textColor = .main
+        $0.font = UIFont.systemFont(ofSize: 14)
+    }
+    private let endTimeLabel = UILabel().then {
+        $0.text = "00:00"
+        $0.textColor = .gray
+        $0.font = UIFont.systemFont(ofSize: 14)
+    }
+    private lazy var seekBarStack = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 2
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .equalSpacing
+        [startTimeLabel, endTimeLabel].forEach { stackView.addArrangedSubview($0) }
+        $0.addArrangedSubview(seekBar)
+        $0.addArrangedSubview(stackView)
+    }
+    private lazy var playController = UIStackView().then {
+        $0.axis = .horizontal
+        $0.distribution = .equalSpacing
+        $0.addArrangedSubview(repeatButton)
+        $0.addArrangedSubview(prevSongButton)
+        $0.addArrangedSubview(playButton)
+        $0.addArrangedSubview(nextSongButton)
+        $0.addArrangedSubview(shuffleButton)
+    }
+    private let playButton = UIButton().then {
+        var image = UIImage(systemName: "play.fill")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 45))
+        $0.setImage(image, for: .normal)
+    }
+    private let nextSongButton = UIButton().then {
+        var image = UIImage(systemName: "forward.end.fill")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 30))
+        $0.setImage(image, for: .normal)
+    }
+    private let prevSongButton = UIButton().then {
+        var image = UIImage(systemName: "backward.end.fill")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 30))
+        $0.setImage(image, for: .normal)
+    }
+    private let repeatButton = UIButton().then {
+        var image = UIImage(systemName: "repeat.1")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 15))
+        $0.setImage(image, for: .normal)
+    }
+    
+    private let shuffleButton = UIButton().then {
+        var image = UIImage(systemName: "shuffle")?.withTintColor(UIColor.white, renderingMode: .alwaysOriginal)
+        image = image?.applyingSymbolConfiguration(.init(pointSize: 15))
+        $0.setImage(image, for: .normal)
+    }
     private let disposeBag = DisposeBag()
     
     // MARK: - LifeCycle
@@ -112,15 +200,34 @@ class MusicPlayViewController: UIViewController {
     
     func addSubViews() {
         view.addSubview(stackView)
+        view.addSubview(bottomStack)
+        view.addSubview(seekBarStack)
+        view.addSubview(playController)
     }
         
     func setupConstraints() {
         albumImage.snp.makeConstraints { make in
-            make.width.height.equalTo(200)
+            make.width.height.equalTo(240)
         }
         stackView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(150)
             make.centerX.equalToSuperview()
+        }
+        bottomStack.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().inset(45)
+        }
+        seekBarStack.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.bottom.equalTo(playController.snp.top).offset(-20)
+        }
+        seekBar.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(seekBarStack)
+            make.height.equalTo(4)
+        }
+        playController.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(bottomStack)
+            make.bottom.equalTo(bottomStack.snp.top).offset(-40)
         }
     }
 }
