@@ -35,7 +35,7 @@ class TabBarViewController: UIViewController {
     private lazy var tabButtonStack = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
-    }       
+    }
     
     var selectedIndex = 0 {
         willSet {
@@ -54,18 +54,40 @@ class TabBarViewController: UIViewController {
         setupTabBar()
         bind()
     }
+    private let musicPlayVC = MusicPlayViewController()
+    var viewTranslation = CGPoint.zero
     
     // MARK: - Methods
     
     func bind() {
-        musicPlayer.rx.tapGesture()
-            .when(.recognized)
-            .subscribe(onNext: {_ in                
-                let musicPlayNavController = UINavigationController()
-                let musicPlayVC = MusicPlayViewController()
-                musicPlayNavController.setViewControllers([musicPlayVC], animated: true)
-                musicPlayNavController.modalPresentationStyle = .fullScreen
-                self.present(musicPlayNavController, animated: true)
+        musicPlayVC.view.frame.origin.y = UIScreen.main.bounds.maxY
+        view.addSubview(musicPlayVC.view)
+        
+        musicPlayer.rx.panGesture()
+            .withUnretained(self)
+            .subscribe(onNext: { (vc, sender) in
+                vc.viewTranslation = sender.translation(in: vc.view)
+                let velocity = sender.velocity(in: vc.view)
+                switch sender.state {
+                case .changed:
+                    let translateY = vc.viewTranslation.y
+                    vc.musicPlayVC.view.transform = CGAffineTransform(translationX: 0, y: translateY)
+                    break
+                case .ended:
+                    let shouldDismiss = velocity.y > 0
+                    if shouldDismiss {
+                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                            vc.musicPlayVC.view.frame.origin.y = UIScreen.main.bounds.maxY
+                        })
+                    } else {
+                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                            vc.musicPlayVC.view.frame.origin.y = 0
+                        })
+                    }
+                    break
+                default:
+                    break
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -105,7 +127,7 @@ class TabBarViewController: UIViewController {
             let button = UIButton()
             var titleContainer = AttributeContainer()
             titleContainer.font = UIFont.systemFont(ofSize: 12)
-                   
+            
             button.configurationUpdateHandler = { button in
                 var configuration = UIButton.Configuration.plain()
                 configuration.attributedTitle = AttributedString(vc.title ?? "", attributes: titleContainer)
