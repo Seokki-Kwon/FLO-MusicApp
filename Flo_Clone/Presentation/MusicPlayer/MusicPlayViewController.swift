@@ -199,8 +199,7 @@ class MusicPlayViewController: UIViewController {
     }
     
     private let disposeBag = DisposeBag()
-    var viewTranslation = CGPoint.zero
-    
+    var translateY: CGFloat = 0.0
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -227,12 +226,17 @@ class MusicPlayViewController: UIViewController {
         view.rx.panGesture()
             .withUnretained(self)
             .subscribe(onNext: { (vc, sender) in
-                vc.viewTranslation = sender.translation(in: vc.view)
+                let translation = sender.translation(in: vc.view)
                 let velocity = sender.velocity(in: vc.view)
+                
                 switch sender.state {
+                case .began:
+                    vc.translateY = vc.view.frame.origin.y
                 case .changed:
-                    let translateY = vc.viewTranslation.y
-                    vc.view.transform = CGAffineTransform(translationX: 0, y: max(0, translateY))
+                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                        let newY = max(0, vc.translateY + translation.y)
+                        vc.view.frame.origin.y = newY
+                    })
                     break
                 case .ended:
                     let shouldDismiss = velocity.y > 0
@@ -245,7 +249,6 @@ class MusicPlayViewController: UIViewController {
                             vc.view.frame.origin.y = 0
                         })
                     }
-                    break
                 default:
                     break
                 }

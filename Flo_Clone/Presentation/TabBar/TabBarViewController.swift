@@ -55,8 +55,7 @@ class TabBarViewController: UIViewController {
         bind()
     }
     private let musicPlayVC = MusicPlayViewController()
-    var viewTranslation = CGPoint.zero
-    
+    var translateY: CGFloat = 0.0
     // MARK: - Methods
     
     func bind() {
@@ -66,13 +65,21 @@ class TabBarViewController: UIViewController {
         musicPlayer.rx.panGesture()
             .withUnretained(self)
             .subscribe(onNext: { (vc, sender) in
-                vc.viewTranslation = sender.translation(in: vc.view)
+                // viewTranslation값에 제스처로 이동한 x, y값이 저장
+                let translation = sender.translation(in: vc.view)
                 let velocity = sender.velocity(in: vc.view)
                 switch sender.state {
+                case .began:
+                    // 기존좌표 저장 제스처할때 기존값에 더하기
+                    vc.translateY = vc.musicPlayVC.view.frame.origin.y
                 case .changed:
-                    let translateY = vc.viewTranslation.y
-                    vc.musicPlayVC.view.transform = CGAffineTransform(translationX: 0, y: translateY)
-                    break
+                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                        // 기존 위치에서 y만큼 이동
+                        let newY = max(0, vc.translateY + translation.y)
+                        // 0보다 작아지지 않도록
+                        vc.musicPlayVC.view.frame.origin.y = newY
+                    })
+                    
                 case .ended:
                     let shouldDismiss = velocity.y > 0
                     if shouldDismiss {
@@ -84,10 +91,10 @@ class TabBarViewController: UIViewController {
                             vc.musicPlayVC.view.frame.origin.y = 0
                         })
                     }
-                    break
                 default:
                     break
                 }
+                
             })
             .disposed(by: disposeBag)
     }
