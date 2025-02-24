@@ -36,8 +36,10 @@ class TabBarViewController: UIViewController {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
     }
+    private let musicPlayVC = MusicPlayViewController()
+    private var translateY: CGFloat = 0.0
     
-    var selectedIndex = 0 {
+    private var selectedIndex = 0 {
         willSet {
             previewsIndex = selectedIndex
         }
@@ -51,52 +53,19 @@ class TabBarViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        addSubViews()
         setupTabBar()
-        bind()
+        bind()       
     }
-    private let musicPlayVC = MusicPlayViewController()
-    var translateY: CGFloat = 0.0
     // MARK: - Methods
     
-    func bind() {
-        musicPlayVC.view.frame.origin.y = UIScreen.main.bounds.maxY
+    func addSubViews() {
+        view.addSubview(tabBarView)
+        view.addSubview(musicPlayer)
         view.addSubview(musicPlayVC.view)
-        
-        musicPlayer.rx.panGesture()
-            .withUnretained(self)
-            .subscribe(onNext: { (vc, sender) in
-                // viewTranslation값에 제스처로 이동한 x, y값이 저장
-                let translation = sender.translation(in: vc.view)
-                let velocity = sender.velocity(in: vc.view)
-                switch sender.state {
-                case .began:
-                    // 기존좌표 저장 제스처할때 기존값에 더하기
-                    vc.translateY = vc.musicPlayVC.view.frame.origin.y
-                case .changed:
-                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        // 기존 위치에서 y만큼 이동
-                        let newY = max(0, vc.translateY + translation.y)
-                        // 0보다 작아지지 않도록
-                        vc.musicPlayVC.view.frame.origin.y = newY
-                    })
-                    
-                case .ended:
-                    let shouldDismiss = velocity.y > 0
-                    if shouldDismiss {
-                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            vc.musicPlayVC.view.frame.origin.y = UIScreen.main.bounds.maxY
-                        })
-                    } else {
-                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            vc.musicPlayVC.view.frame.origin.y = 0
-                        })
-                    }
-                default:
-                    break
-                }
-                
-            })
-            .disposed(by: disposeBag)
+    }
+    
+    func bind() {
     }
     
     func setViewControllers(_ viewControllers: [UIViewController]) {
@@ -106,9 +75,6 @@ class TabBarViewController: UIViewController {
     }
     
     private func setupTabBar() {
-        view.addSubview(tabBarView)
-        view.addSubview(musicPlayer)
-        
         tabBarView.snp.makeConstraints {
             $0.bottom.trailing.leading.equalToSuperview()
             $0.height.equalTo(80)
@@ -117,6 +83,10 @@ class TabBarViewController: UIViewController {
         musicPlayer.snp.makeConstraints { make in
             make.bottom.equalTo(tabBarView.snp.top)
             make.leading.trailing.equalToSuperview()
+        }        
+        musicPlayVC.view.snp.makeConstraints { make in
+            make.top.leading.trailing.equalTo(musicPlayer)
+            make.height.equalTo(view.frame.height)
         }
     }
     

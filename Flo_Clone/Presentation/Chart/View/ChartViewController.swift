@@ -64,7 +64,7 @@ class ChartViewController: UIViewController {
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()        
         chartTableView.register(MusicCell.self, forCellReuseIdentifier: MusicCell.identifier)
         addSubViews()
         setupConstraints()

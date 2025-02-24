@@ -199,7 +199,8 @@ class MusicPlayViewController: UIViewController {
     }
     
     private let disposeBag = DisposeBag()
-    var translateY: CGFloat = 0.0
+    private var initialPosition: CGFloat = .zero
+    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -209,6 +210,14 @@ class MusicPlayViewController: UIViewController {
         addSubViews()
         setupConstraints()
         bind()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // 초기위치 저장
+        if initialPosition.isZero {
+            initialPosition = view.frame.origin.y
+        }
     }
     
     // MARK: - Method
@@ -226,23 +235,21 @@ class MusicPlayViewController: UIViewController {
         view.rx.panGesture()
             .withUnretained(self)
             .subscribe(onNext: { (vc, sender) in
-                let translation = sender.translation(in: vc.view)
-                let velocity = sender.velocity(in: vc.view)
+                guard let superView = vc.view.superview else { return }
+                let translation = sender.translation(in: superView)
+                let velocity = sender.velocity(in: superView)
                 
                 switch sender.state {
-                case .began:
-                    vc.translateY = vc.view.frame.origin.y
                 case .changed:
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        let newY = max(0, vc.translateY + translation.y)
-                        vc.view.frame.origin.y = newY
-                    })
+                        vc.view.frame.origin.y = min(max(vc.view.frame.origin.y + translation.y, 0), vc.initialPosition)
+                    })                                        
                     break
                 case .ended:
-                    let shouldDismiss = velocity.y > 0
+                    let shouldDismiss = velocity.y > 0.1
                     if shouldDismiss {
                         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            vc.view.frame.origin.y = UIScreen.main.bounds.maxY
+                            vc.view.frame.origin.y =  vc.initialPosition
                         })
                     } else {
                         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
@@ -252,6 +259,8 @@ class MusicPlayViewController: UIViewController {
                 default:
                     break
                 }
+                
+                sender.setTranslation(.zero, in: vc.view)
             })
             .disposed(by: disposeBag)
     }
@@ -307,3 +316,4 @@ class MusicPlayViewController: UIViewController {
         }
     }
 }
+
