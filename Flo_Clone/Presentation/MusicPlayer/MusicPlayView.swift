@@ -1,8 +1,8 @@
 //
-//  MusicPlayViewController.swift
+//  MusicPlayView.swift
 //  Flo_Clone
 //
-//  Created by 권석기 on 2/8/25.
+//  Created by 권석기 on 2/25/25.
 //
 
 import UIKit
@@ -12,8 +12,8 @@ import RxGesture
 import RxSwift
 import RxCocoa
 
-class MusicPlayViewController: UIViewController {
-    
+class MusicPlayView: UIView {
+
     // MARK: - Properties
     
     // Header
@@ -201,22 +201,22 @@ class MusicPlayViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private var initialPosition: CGFloat = .zero
     
-    // MARK: - LifeCycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .black
-        navigationController?.navigationBar.isHidden = true
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .black
         addSubViews()
         setupConstraints()
         bind()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        // 초기위치 저장
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
         if initialPosition.isZero {
-            initialPosition = view.frame.origin.y
+            initialPosition = self.frame.origin.y
         }
     }
     
@@ -225,53 +225,54 @@ class MusicPlayViewController: UIViewController {
     func bind() {
         closeButton.rx.tap
             .withUnretained(self)
-            .subscribe(onNext: { (vc, _) in
+            .subscribe(onNext: { (view, _) in
                 UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                    vc.view.frame.origin.y = UIScreen.main.bounds.maxY
+                    view.frame.origin.y = view.initialPosition
                 })
             })
             .disposed(by: disposeBag)
         
-        view.rx.panGesture()
+        self.rx.panGesture()
             .withUnretained(self)
-            .subscribe(onNext: { (vc, sender) in
-                guard let superView = vc.view.superview else { return }
+            .subscribe(onNext: { (view, sender) in
+                guard let superView = view.superview else { return }
                 let translation = sender.translation(in: superView)
                 let velocity = sender.velocity(in: superView)
+                let scrollDown = velocity.y > 0.0
                 
                 switch sender.state {
                 case .changed:
+                    // 스크롤되면 layer의 height를 증가시킨다.
+                    // 일정스크롤 이상되면 layer를 hidden 처리
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        vc.view.frame.origin.y = min(max(vc.view.frame.origin.y + translation.y, 0), vc.initialPosition)
-                    })                                        
+                        view.frame.origin.y = min(max(view.frame.origin.y + translation.y, 0), view.initialPosition)
+                    })
                     break
                 case .ended:
-                    let shouldDismiss = velocity.y > 0.1
-                    if shouldDismiss {
+                    if scrollDown {
                         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            vc.view.frame.origin.y =  vc.initialPosition
+                            view.frame.origin.y =  view.initialPosition
                         })
                     } else {
                         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            vc.view.frame.origin.y = 0
+                            view.frame.origin.y = 0
                         })
                     }
                 default:
                     break
                 }
                 
-                sender.setTranslation(.zero, in: vc.view)
+                sender.setTranslation(.zero, in: view)
             })
             .disposed(by: disposeBag)
     }
     
-    
     func addSubViews() {
-        view.addSubview(headerStack)
-        view.addSubview(stackView)
-        view.addSubview(bottomStack)
-        view.addSubview(seekBarStack)
-        view.addSubview(playController)
+        self.addSubview(headerStack)
+        self.addSubview(stackView)
+        self.addSubview(bottomStack)
+        self.addSubview(seekBarStack)
+        self.addSubview(playController)
     }
     
     func safeAreaTopInset() -> CGFloat {
@@ -316,4 +317,3 @@ class MusicPlayViewController: UIViewController {
         }
     }
 }
-

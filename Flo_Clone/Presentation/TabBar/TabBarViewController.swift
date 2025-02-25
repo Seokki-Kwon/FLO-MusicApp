@@ -31,13 +31,12 @@ class TabBarViewController: UIViewController {
     }
     
     private let musicPlayer = MusicPlayer()
+    private let musicPlayView = MusicPlayView()
     
     private lazy var tabButtonStack = UIStackView().then {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
-    }
-    private let musicPlayVC = MusicPlayViewController()
-    private var translateY: CGFloat = 0.0
+    }        
     
     private var selectedIndex = 0 {
         willSet {
@@ -62,7 +61,7 @@ class TabBarViewController: UIViewController {
     func addSubViews() {
         view.addSubview(tabBarView)
         view.addSubview(musicPlayer)
-        view.addSubview(musicPlayVC.view)
+        view.addSubview(musicPlayView)
     }
     
     func bind() {
@@ -84,7 +83,7 @@ class TabBarViewController: UIViewController {
             make.bottom.equalTo(tabBarView.snp.top)
             make.leading.trailing.equalToSuperview()
         }        
-        musicPlayVC.view.snp.makeConstraints { make in
+        musicPlayView.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(musicPlayer)
             make.height.equalTo(view.frame.height)
         }

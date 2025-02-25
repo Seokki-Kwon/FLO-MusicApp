@@ -37,6 +37,19 @@ extension ObservableType {
       }
 }
 
+extension UIView {
+    func mask(rect: CGRect) {
+        let path = CGMutablePath()
+        path.addRect(rect)
+        
+        let shareLayer = CAShapeLayer()
+        shareLayer.path = path
+        shareLayer.fillRule = .evenOdd
+        
+        layer.mask = shareLayer
+    }
+}
+
 //extension Reactive where Base: UIPageViewController {
 //    var delegate : DelegateProxy<UIPageViewController, UIPageViewControllerDelegate> {
 //        return RxUIPageViewControllerDelegateProxy.proxy(for: self.base)

@@ -8,6 +8,9 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
+import RxGesture
 
 class MusicPlayer: UIView {
     private let songTitleLabel = UILabel().then {
@@ -55,9 +58,14 @@ class MusicPlayer: UIView {
         $0.addArrangedSubview(playButton)
         $0.addArrangedSubview(nextButton)
     }
-    
+    let disposeBag = DisposeBag()
     override init(frame: CGRect) {
         super.init(frame: frame)
+        playButton.rx.tapGesture()
+            .subscribe(onNext: { _ in
+                print("PlayButton Tap")
+            })
+            .disposed(by: disposeBag)
         setupUI()
     }
     
@@ -66,8 +74,7 @@ class MusicPlayer: UIView {
     }
     
     private func setupUI() {
-        self.backgroundColor = .background
-        
+        self.backgroundColor = .background        
         addSubview(musicInfoStack)
         addSubview(progressView)
         addSubview(buttonStackView)
