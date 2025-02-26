@@ -216,7 +216,7 @@ class MusicPlayView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         if initialPosition.isZero {
-            initialPosition = self.frame.origin.y
+            initialPosition = self.frame.origin.y            
         }
     }
     
@@ -233,14 +233,6 @@ class MusicPlayView: UIView {
                 })
             })
             .disposed(by: disposeBag)
-    }
-    
-    func dismissView() {
-        frame.origin.y =  initialPosition
-    }
-    
-    func presentView() {
-        frame.origin.y = 0
     }
     
     func addSubViews() {

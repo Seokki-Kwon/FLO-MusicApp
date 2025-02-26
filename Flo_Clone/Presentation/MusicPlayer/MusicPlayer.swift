@@ -12,6 +12,7 @@ import RxSwift
 import RxCocoa
 import RxGesture
 
+
 class MusicPlayer: UIView {
     private let songTitleLabel = UILabel().then {
         $0.font = UIFont.boldSystemFont(ofSize: 16)
@@ -95,7 +96,7 @@ class MusicPlayer: UIView {
                     // 일정스크롤 이상되면 layer를 hidden 처리
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
                         owner.musicPlayView.alpha = 1
-                        owner.musicPlayView.frame.origin.y = min(0, owner.musicPlayView.frame.origin.y + translation.y)
+                        owner.musicPlayView.frame.origin.y = min(0, max(owner.musicPlayView.frame.origin.y + translation.y, -owner.frame.origin.y))
                     })
                     break
                 case .ended:
@@ -117,7 +118,7 @@ class MusicPlayer: UIView {
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: { [weak self] in
             guard let self = self else { return }
             musicPlayView.alpha = 1
-            musicPlayView.frame.origin.y = self.frame.origin.y
+            musicPlayView.frame.origin.y = -self.frame.origin.y
         })
     }
     

@@ -18,7 +18,7 @@ final class ChartListViewModel {
         Category(categoryId: 4, categoryName: "해외 팝"),
         Category(categoryId: 5, categoryName: "국내 댄스/일렉")
     ])
-    let curPageIndex = BehaviorSubject<Int>(value: 0)
+    let curPageIndex = BehaviorSubject<Int>(value: 0)        
     
     func setPageIndex(_ index: Int) {
         curPageIndex.on(.next(index))
