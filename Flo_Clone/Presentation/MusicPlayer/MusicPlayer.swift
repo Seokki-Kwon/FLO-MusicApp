@@ -58,19 +58,91 @@ class MusicPlayer: UIView {
         $0.addArrangedSubview(playButton)
         $0.addArrangedSubview(nextButton)
     }
+    
     let disposeBag = DisposeBag()
+    let musicPlayView = MusicPlayView()
     override init(frame: CGRect) {
         super.init(frame: frame)
-        playButton.rx.tapGesture()
-            .subscribe(onNext: { _ in
-                print("PlayButton Tap")
-            })
-            .disposed(by: disposeBag)
         setupUI()
+        bind()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func bind() {
+        self.rx.tapGesture()
+            .withUnretained(self)
+            .subscribe(onNext: { owner, sender in
+                if sender.state == .changed {
+                    owner.showPlayView()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        self.rx.panGesture()
+            .withUnretained(self)
+            .subscribe(onNext: { (owner, sender) in
+                guard let superView = owner.superview else { return }
+                let translation = sender.translation(in: superView)
+                let velocity = sender.velocity(in: superView)
+                let scrollDown = velocity.y > 0.0
+                
+                switch sender.state {
+                case .changed:
+                    // 스크롤되면 layer의 height를 증가시킨다.
+                    // 일정스크롤 이상되면 layer를 hidden 처리
+                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                        owner.musicPlayView.alpha = 1
+                        owner.musicPlayView.frame.origin.y = min(0, owner.musicPlayView.frame.origin.y + translation.y)
+                    })
+                    break
+                case .ended:
+                    if scrollDown {
+                        owner.hidePlayView()
+                    } else {
+                        owner.showPlayView()
+                    }
+                default:
+                    break
+                }
+                
+                sender.setTranslation(.zero, in: owner)
+            })
+            .disposed(by: disposeBag)
+    }        
+    
+    func showPlayView() {
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+            guard let self = self else { return }
+            musicPlayView.alpha = 1
+            musicPlayView.frame.origin.y = self.frame.origin.y
+        })
+    }
+    
+    func hidePlayView() {
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+            guard let self = self else { return }
+            musicPlayView.frame.origin.y = 0
+        }, completion: { [weak self] _ in
+            guard let self = self else { return }
+            musicPlayView.alpha = 0
+        })
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if let hitView = super.hitTest(point, with: event) {
+            return hitView
+        }
+                
+        for subview in subviews {
+            let convertedPoint = subview.convert(point, from: self)
+            if let hitSubview = subview.hitTest(convertedPoint, with: event) {
+                return hitSubview
+            }
+        }
+        return nil
     }
     
     private func setupUI() {
@@ -78,6 +150,8 @@ class MusicPlayer: UIView {
         addSubview(musicInfoStack)
         addSubview(progressView)
         addSubview(buttonStackView)
+        musicPlayView.alpha = 0
+        addSubview(musicPlayView)
         
         self.snp.makeConstraints { make in
             make.height.equalTo(60)
@@ -93,6 +167,10 @@ class MusicPlayer: UIView {
         buttonStackView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
+        }
+        musicPlayView.snp.makeConstraints { make in
+            make.leading.trailing.top.equalToSuperview()
+            make.height.equalTo(UIScreen.main.bounds.height)
         }
     }
 }

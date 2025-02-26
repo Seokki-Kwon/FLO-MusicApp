@@ -228,43 +228,19 @@ class MusicPlayView: UIView {
             .subscribe(onNext: { (view, _) in
                 UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
                     view.frame.origin.y = view.initialPosition
+                }, completion: { _ in
+                    view.alpha = 0
                 })
             })
             .disposed(by: disposeBag)
-        
-        self.rx.panGesture()
-            .withUnretained(self)
-            .subscribe(onNext: { (view, sender) in
-                guard let superView = view.superview else { return }
-                let translation = sender.translation(in: superView)
-                let velocity = sender.velocity(in: superView)
-                let scrollDown = velocity.y > 0.0
-                
-                switch sender.state {
-                case .changed:
-                    // 스크롤되면 layer의 height를 증가시킨다.
-                    // 일정스크롤 이상되면 layer를 hidden 처리
-                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        view.frame.origin.y = min(max(view.frame.origin.y + translation.y, 0), view.initialPosition)
-                    })
-                    break
-                case .ended:
-                    if scrollDown {
-                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            view.frame.origin.y =  view.initialPosition
-                        })
-                    } else {
-                        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                            view.frame.origin.y = 0
-                        })
-                    }
-                default:
-                    break
-                }
-                
-                sender.setTranslation(.zero, in: view)
-            })
-            .disposed(by: disposeBag)
+    }
+    
+    func dismissView() {
+        frame.origin.y =  initialPosition
+    }
+    
+    func presentView() {
+        frame.origin.y = 0
     }
     
     func addSubViews() {
