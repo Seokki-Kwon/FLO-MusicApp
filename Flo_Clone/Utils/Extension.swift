@@ -50,8 +50,3 @@ extension UIView {
     }
 }
 
-//extension Reactive where Base: UIPageViewController {
-//    var delegate : DelegateProxy<UIPageViewController, UIPageViewControllerDelegate> {
-//        return RxUIPageViewControllerDelegateProxy.proxy(for: self.base)
-//       }
-//}

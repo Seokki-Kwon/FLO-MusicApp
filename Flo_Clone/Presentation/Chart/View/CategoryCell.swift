@@ -49,7 +49,7 @@ class CategoryCell: UICollectionViewCell {
     
     func configure(_ category: Category) {
         // 초기 UI설정
-        categoryLabel.text = category.categoryName        
+        categoryLabel.text = category.rawValue
     }
     
     override func prepareForReuse() {

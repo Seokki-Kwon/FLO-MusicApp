@@ -16,7 +16,7 @@ class ChartViewController: UIViewController {
     // MARK: - Properties
     
     let bag = DisposeBag()
-    let chartVM = ChartViewModel()
+    let viewModel: ChartViewModel
     
     private let selecteAllButton = UIButton().then {
         var buttonConfig = UIButton.Configuration.plain()
@@ -73,8 +73,10 @@ class ChartViewController: UIViewController {
     
     // MARK: - Initializer
     
-    init() {
+    init(viewModel: ChartViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        
     }
     
     required init?(coder: NSCoder) {
@@ -85,7 +87,7 @@ class ChartViewController: UIViewController {
     
     func bind() {
                 
-        chartVM.chartList
+        viewModel.musicList
             .bind(to: chartTableView.rx.items) { (tableView, row, item) in
                 let cell = tableView.dequeueReusableCell(withIdentifier: MusicCell.identifier) as! MusicCell
                 cell.configure(item)

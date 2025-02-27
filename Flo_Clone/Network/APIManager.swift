@@ -28,13 +28,13 @@ final class APIManager {
                         }
                         
                         observer.on(.next(result))
-                    case let .failure(error):                        
+                    case let .failure(error):
                         observer.on(.error(error))
                     }
                 }
             return Disposables.create {
                 request.cancel()
             }
-        } 
+        }
     }
 }

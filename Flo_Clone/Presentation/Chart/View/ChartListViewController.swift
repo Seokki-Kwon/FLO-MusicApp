@@ -36,11 +36,11 @@ class ChartListViewController: UIViewController {
     }
     
     private lazy var subViews: [UIViewController] = {
-        let viewControllers = charListVM.categoryItems.value.map { _ in ChartViewController() }
+        let viewControllers = viewModel.categoryItems.value.map { ChartViewController(viewModel: ChartViewModel(category: $0.key)) }
         return viewControllers
     }()
     
-    private let charListVM = ChartListViewModel()
+    private let viewModel = CategoryViewModel()
     private let disposeBag = DisposeBag()
     
     // MARK: - LifeCycle
@@ -64,7 +64,7 @@ class ChartListViewController: UIViewController {
     func bind() {
         
         // 카테고리 변경시 탭UI 변경
-        charListVM.categoryItems
+        viewModel.categoryItems
             .bind(to: self.collectionView.rx.items) { tableView, row, item in
                 let cell = self.collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.identifier, for: IndexPath(row: row, section: 0)) as! CategoryCell
                 cell.configure(item)
@@ -77,12 +77,12 @@ class ChartListViewController: UIViewController {
         collectionView.rx.modelSelected(Category.self)
             .withUnretained(self)
             .subscribe(onNext: { (vc, category) in
-                vc.charListVM.setPageIndex(category.categoryId)
+                vc.viewModel.setPageIndex(category.index)
             })
             .disposed(by: disposeBag)
         
         // 인덱스 변경시 페이지이동
-        charListVM.curPageIndex
+        viewModel.curPageIndex
             .withPrevious(startWith: 0)
             .withUnretained(self)
             .subscribe(onNext: { (vc, arg1) in
@@ -135,7 +135,7 @@ class ChartListViewController: UIViewController {
 
 extension ChartListViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let text = charListVM.categoryItems.value[indexPath.item].categoryName
+        let text = viewModel.categoryItems.value[indexPath.item].rawValue
         let font = UIFont.systemFont(ofSize: 16)
         let cellWidth = (text as NSString).size(withAttributes: [.font: font]).width + 20
         return CGSize(width: cellWidth, height: 50)
@@ -165,6 +165,6 @@ extension ChartListViewController:  UIPageViewControllerDataSource, UIPageViewCo
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         guard let currentVC = pageViewController.viewControllers?.first,
               let currentIndex = subViews.firstIndex(of: currentVC) else { return }
-        charListVM.setPageIndex(currentIndex)
+        viewModel.setPageIndex(currentIndex)
     }
 }
